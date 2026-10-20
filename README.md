@@ -2,7 +2,10 @@
 
 Simple, clean, and fast Weather Web App using the Visual Crossing Weather API.
 
-🔗 **Project URL:** [https://github.com/matteobertasaa/Weather-Web-App](https://github.com/matteobertasaa/Weather-Web-App)
+Sample solution for the [Weather App](https://roadmap.sh/projects/weather-app) challenge from [roadmap.sh](https://roadmap.sh).
+
+- **Project URL:** https://roadmap.sh/projects/weather-app
+- **GitHub Repository:** https://github.com/matteobertasaa/Weather-Web-App
 
 ## Interface
 
