@@ -1,0 +1,8 @@
+# File di ambiente contenente dati sensibili e chiavi API
+.env
+.env.local
+.env.*.local
+
+# File di sistema
+.DS_Store
+Thumbs.db

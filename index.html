@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="icon" href="favicon/icons8-weather-96.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>  
+    <div class="weather-icon">
+        <img id="weatherIcon" src="favicon/icons8-weather-96.png" alt="Weather Icon">
+    </div>
+
+    <div class="input-container">
+        <input type="text" id="locationInput" placeholder="Enter location...">
+        <button id="searchButton">Search</button>
+    </div>
+
+    <div class="weather-container" id="weatherContainer">
+        <h2 id="Location"></h2>
+        <h1 id="temperature"></h1>
+        <p id="meteorologicalConditions" style="font-weight: bold; font-size: 1.1rem; color: #555; margin: 5px 0;"></p>
+        <p id="windSpeed" style="margin: 5px 0; font-size: 0.9rem;"></p>
+        <p id="rainChance" style="margin: 5px 0; font-size: 0.9rem;"></p>
+
+        <h3 class="forecast-title">7-Day Forecast</h3>
+        <div class="forecast-container" id="forecastContainer"></div>
+    </div>
+
+    <script>
+        let apikey = '';
+
+        async function loadApiKey() {
+            if (apikey) return apikey;
+            try {
+                const res = await fetch('.env');
+                if (res.ok) {
+                    const text = await res.text();
+                    const lines = text.split(/\r?\n/);
+                    for (const line of lines) {
+                        const trimmed = line.trim();
+                        if (trimmed.startsWith('API_KEY=')) {
+                            apikey = trimmed.substring('API_KEY='.length).replace(/["']/g, '').trim();
+                            if (apikey) return apikey;
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+
+            apikey = localStorage.getItem('API_KEY') || '';
+            if (!apikey) {
+                const inputKey = prompt('Inserisci la tua API Key di Visual Crossing:');
+                if (inputKey && inputKey.trim()) {
+                    apikey = inputKey.trim();
+                    localStorage.setItem('API_KEY', apikey);
+                }
+            }
+
+            return apikey;
+        }
+
+        const searchButton = document.getElementById('searchButton');
+        const locationInput = document.getElementById('locationInput');
+        const weatherContainer = document.getElementById('weatherContainer');
+
+        searchButton.addEventListener('click', async () => {
+            const location = locationInput.value.trim();
+            
+            if(!location) {
+                weatherContainer.style.display = 'none';
+                document.body.classList.remove('weather-active');
+                return;
+            }
+
+            const currentKey = await loadApiKey();
+            if (!currentKey) {
+                alert('API Key mancante! Inserisci la tua API Key per procedere.');
+                return;
+            }
+
+            const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${encodeURIComponent(location)}?unitGroup=metric&key=${currentKey}&contentType=json`;
+
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error('Location not found');
+                    return res.json();
+                })
+                .then(data => {
+                    const current = data.currentConditions;
+
+                    weatherContainer.style.display = 'block';
+                    document.body.classList.add('weather-active');
+
+                    document.getElementById('Location').textContent = data.resolvedAddress;
+                    document.getElementById('temperature').textContent = `${Math.round(current.temp)}°C`;
+                    document.getElementById('meteorologicalConditions').textContent = current.conditions;
+                    document.getElementById('windSpeed').textContent = `Wind: ${Math.round(current.windspeed)} km/h`;
+                    document.getElementById('rainChance').textContent = `Rain Chance: ${current.precipprob}%`;
+
+                    const forecastContainer = document.getElementById('forecastContainer');
+                    forecastContainer.innerHTML = ''; 
+                    
+                    data.days.slice(1, 8).forEach(day => {
+                        const date = new Date(day.datetime);
+                        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                        const mainCondition = day.conditions.split(',')[0];
+
+                        const card = document.createElement('div');
+                        card.className = 'forecast-card';
+                        card.innerHTML = `
+                            <h4>${dayName}</h4>
+                            <p class="temp-high">${Math.round(day.tempmax)}°</p>
+                            <p class="temp-low">${Math.round(day.tempmin)}°</p>
+                            <p class="condition">${mainCondition}</p>
+                        `;
+                        forecastContainer.appendChild(card);
+                    });
+                })
+                .catch(() => alert('Error fetching data. Ensure the location exists and your API key is valid.'));
+        });
+
+        locationInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') searchButton.click();
+        });
+    </script>
+</body>
+</html>
