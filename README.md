@@ -2,6 +2,8 @@
 
 Simple, clean, and fast Weather Web App using the Visual Crossing Weather API.
 
+🔗 **Project URL:** [https://github.com/matteobertasaa/Weather-Web-App](https://github.com/matteobertasaa/Weather-Web-App)
+
 ## Interface
 
 ![Interface](Interfaccia/image.png)
@@ -33,7 +35,7 @@ For security reasons, the API key is not included in the source code.
 
 ## How to run the project
 
-1. Download the project by running `git clone <REPOSITORY_URL>` or by downloading the .ZIP file.
+1. Download the project by running `git clone https://github.com/matteobertasaa/Weather-Web-App.git` or by downloading the .ZIP file.
 2. Open the project folder in VS Code.
 3. Configure the `.env` file following the instructions above.
 4. Use the **Live Server** extension to launch and view the project in your browser. (Note: The app will also prompt you for the API key if it cannot read the `.env` file).
